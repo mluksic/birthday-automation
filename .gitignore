@@ -22,3 +22,7 @@ birthdays.csv
 
 # Go workspace file
 go.work
+
+
+# Local .terraform directories
+**/.terraform/*
