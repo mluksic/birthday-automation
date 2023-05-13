@@ -2,16 +2,13 @@ package main
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
+	"github.com/aws/aws-lambda-go/lambda"
 	"log"
+	"net/smtp"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/twilio/twilio-go"
-	openapi "github.com/twilio/twilio-go/rest/api/v2010"
 )
 
 type User struct {
@@ -21,6 +18,28 @@ type User struct {
 
 func main() {
 	lambda.Start(SendBirthdayAlert)
+}
+
+func sendEmail(todayBirthdays []string) {
+	from := os.Getenv("fromEmail")
+	password := os.Getenv("appPassword")
+	receivers := []string{"luksic.miha@gmail.com"}
+
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	subject := "današnji rojstni dnevi"
+	birthdays := strings.Join(todayBirthdays, ", ")
+	message := []byte(fmt.Sprintf("Subject: %s \n\n %s\n", subject, birthdays))
+
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, receivers, message)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	fmt.Println("Email Sent Successfully!")
 }
 
 func SendBirthdayAlert() {
@@ -33,7 +52,7 @@ func SendBirthdayAlert() {
 	var todaysBirthdays = getTodaysBirthdays(records)
 
 	if len(todaysBirthdays) > 0 {
-		sendBirthdaySMS(todaysBirthdays)
+		sendEmail(todaysBirthdays)
 	}
 }
 
@@ -88,6 +107,7 @@ func getTodaysBirthdays(records [][]string) []string {
 	return birthdayPersons
 }
 
+/*
 func sendBirthdaySMS(birthdays []string) {
 	accountSid := os.Getenv("accountSid")
 	authToken := os.Getenv("authToken")
@@ -111,3 +131,4 @@ func sendBirthdaySMS(birthdays []string) {
 		fmt.Println("Response: " + string(response))
 	}
 }
+*/
