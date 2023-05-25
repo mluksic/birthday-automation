@@ -20,7 +20,7 @@ func main() {
 	lambda.Start(SendBirthdayAlert)
 }
 
-func sendEmail(todayBirthdays []string) {
+func sendEmail(todayBirthdays []User) {
 	from := os.Getenv("fromEmail")
 	password := os.Getenv("appPassword")
 	receivers := []string{"luksic.miha@gmail.com"}
@@ -29,8 +29,14 @@ func sendEmail(todayBirthdays []string) {
 	smtpPort := "587"
 
 	subject := "današnji rojstni dnevi"
-	birthdays := strings.Join(todayBirthdays, ", ")
-	message := []byte(fmt.Sprintf("Subject: %s \n\n %s\n", subject, birthdays))
+
+	var msg string
+	for _, birthday := range todayBirthdays {
+		msg += strings.Join([]string{birthday.fullName, birthday.birthday}, " - ")
+		msg += "\n"
+	}
+
+	message := []byte(fmt.Sprintf("Subject: %s \n\n %s\n", subject, msg))
 
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
@@ -82,9 +88,8 @@ func readFile(filename string) ([][]string, error) {
 	return records, nil
 }
 
-func getTodaysBirthdays(records [][]string) []string {
-
-	var birthdayPersons []string
+func getTodaysBirthdays(records [][]string) []User {
+	var birthdayPersons []User
 	currentDate := time.Now().Local()
 
 	for _, record := range records {
@@ -100,7 +105,7 @@ func getTodaysBirthdays(records [][]string) []string {
 		}
 
 		if currentDate.Day() == parsedUserBirthday.Day() && currentDate.Month() == parsedUserBirthday.Month() {
-			birthdayPersons = append(birthdayPersons, user.fullName)
+			birthdayPersons = append(birthdayPersons, user)
 		}
 	}
 
