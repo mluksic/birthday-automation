@@ -16,10 +16,12 @@ Download and install:
 
 ### Running the app
 
-1. Create `birthdays.csv` file with people's birthdays
-2. Change environment variables
-3. Run command below to start the project
+1. Create `birthdays.csv` file with your birthdays
+```
+$ cp example_birthdays.csv birthdays.csv
+```
 
+2. Run app start command
 ```bash
 $ go run main.go
 ```
@@ -42,12 +44,17 @@ $ zip birthdays.zip birthdays birthdays.csv
 
 Project uses [Terraform](https://www.terraform.io/) to deploy and provising AWS Lambda function, triggers ect.
 
+Create `secret.tfvars` and fill it with your variables
+```
+$ cd tf
+$ cp example.tfvars secret.tfvars
+```
+
 Basic TF commands:
+- `terraform plan --var-file="secret.tfvars"` - compares current state and config file, and displays required provision steps
+- `terraform apply --var-file="secret.tfvars"` - triggers execution plan (spins up AWS Lambda, creates rules, ect.)
 
--   `terraform plan` - compares current state and config file, and displays required provision steps
--   `terraform apply` - triggers execution plan (spins up AWS Lambda, creates rules, ect.)
-
-Lambda is currently being triggered every workday (MON - FRI) at 6pm UTC.
+Lambda is currently being triggered every morning at 6AM UTC.
 
 ### Test
 
