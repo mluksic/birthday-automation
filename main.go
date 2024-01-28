@@ -55,15 +55,15 @@ func SendBirthdayAlert() {
 		log.Fatal(err)
 	}
 
-	var todaysBirthdays = getTodaysBirthdays(records)
+	var todayBirthdays = getTodayBirthdays(records)
 
-	if len(todaysBirthdays) > 0 {
-		sendEmail(todaysBirthdays)
+	if len(todayBirthdays) > 0 {
+		sendEmail(todayBirthdays)
 	}
 }
 
 func readFile(filename string) ([][]string, error) {
-	file, err := os.Open("birthdays.csv")
+	file, err := os.Open(filename)
 
 	if err != nil {
 		log.Fatal(err)
@@ -88,7 +88,7 @@ func readFile(filename string) ([][]string, error) {
 	return records, nil
 }
 
-func getTodaysBirthdays(records [][]string) []User {
+func getTodayBirthdays(records [][]string) []User {
 	var birthdayPersons []User
 	currentDate := time.Now().Local()
 
