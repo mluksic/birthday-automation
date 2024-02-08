@@ -23,7 +23,7 @@ func main() {
 func sendEmail(todayBirthdays []User) {
 	from := os.Getenv("fromEmail")
 	password := os.Getenv("appPassword")
-	receivers := []string{os.Getenv("emailReceivers")}
+	receivers := strings.Split(os.Getenv("emailReceivers"), ",")
 
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
