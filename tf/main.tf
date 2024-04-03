@@ -49,13 +49,11 @@ resource "aws_lambda_function" "birthdayAutomation" {
 
   environment {
     variables = {
-      accountSid          = var.ACCOUNT_SID
-      authToken           = var.AUTH_TOKEN
-      messagingServiceSid = var.SERVICE_ID
-      toPhoneNumber       = var.PHONE_NUMBER
-      fromEmail           = var.FROM_EMAIL
-      appPassword         = var.APP_PASSWORD
-      emailReceivers      = var.EMAIL_RECEIVERS
+      FROM_EMAIL      = var.FROM_EMAIL
+      APP_PASSWORD    = var.APP_PASSWORD
+      EMAIL_RECEIVERS = var.EMAIL_RECEIVERS
+      SMTP_HOST       = var.SMTP_HOST
+      SMTP_PORT       = var.SMTP_PORT
     }
   }
 }

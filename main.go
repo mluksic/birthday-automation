@@ -26,8 +26,8 @@ func NewEmailNotifier() *EmailNotifier {
 	return &EmailNotifier{
 		fromEmail: os.Getenv("FROM_EMAIL"),
 		password:  os.Getenv("APP_PASSWORD"),
-		smtpHost:  "smtp.gmail.com",
-		smtpPort:  "587",
+		smtpHost:  os.Getenv("SMTP_HOST"),
+		smtpPort:  os.Getenv("SMTP_PORT"),
 	}
 }
 
