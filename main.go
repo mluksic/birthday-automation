@@ -11,54 +11,68 @@ import (
 	"time"
 )
 
+type Notifier interface {
+	Notify(msg string) error
+}
+
+type EmailNotifier struct {
+	fromEmail string
+	password  string
+	smtpHost  string
+	smtpPort  string
+}
+
+func NewEmailNotifier() *EmailNotifier {
+	return &EmailNotifier{
+		fromEmail: os.Getenv("FROM_EMAIL"),
+		password:  os.Getenv("APP_PASSWORD"),
+		smtpHost:  "smtp.gmail.com",
+		smtpPort:  "587",
+	}
+}
+
+func (n *EmailNotifier) Notify(msg string) error {
+	message := []byte(fmt.Sprintf("Subject: današnji rojstni dnevi \n\n %s\n", msg))
+
+	receivers := strings.Split(os.Getenv("EMAIL_RECEIVERS"), ", ")
+	auth := smtp.PlainAuth("", n.fromEmail, n.password, n.smtpHost)
+	addr := fmt.Sprintf("%s:%s", n.smtpHost, n.smtpPort)
+
+	err := smtp.SendMail(addr, auth, n.fromEmail, receivers, message)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type User struct {
 	fullName string
 	birthday string
 }
 
 func main() {
-	lambda.Start(SendBirthdayAlert)
+	lambda.Start(birthdayAutomation)
 }
 
-func sendEmail(todayBirthdays []User) {
-	from := os.Getenv("fromEmail")
-	password := os.Getenv("appPassword")
-	receivers := strings.Split(os.Getenv("emailReceivers"), ",")
-
-	smtpHost := "smtp.gmail.com"
-	smtpPort := "587"
-
-	subject := "današnji rojstni dnevi"
-
-	var msg string
-	for _, birthday := range todayBirthdays {
-		msg += strings.Join([]string{birthday.fullName, birthday.birthday}, " - ")
-		msg += "\n"
-	}
-
-	message := []byte(fmt.Sprintf("Subject: %s \n\n %s\n", subject, msg))
-
-	auth := smtp.PlainAuth("", from, password, smtpHost)
-
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, receivers, message)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	fmt.Println("Email Sent Successfully!")
-}
-
-func SendBirthdayAlert() {
+func birthdayAutomation() {
 	records, err := readFile("birthdays.csv")
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var todayBirthdays = getTodayBirthdays(records)
+	todayBirthdays := getTodayBirthdays(records)
+	notifier := NewEmailNotifier()
 
 	if len(todayBirthdays) > 0 {
-		sendEmail(todayBirthdays)
+		msg := createMsg(todayBirthdays)
+
+		err := notifier.Notify(msg)
+		if err != nil {
+			fmt.Printf("%v", err)
+		}
+
+		fmt.Println("Notification sent successfully")
 	}
 }
 
@@ -112,28 +126,13 @@ func getTodayBirthdays(records [][]string) []User {
 	return birthdayPersons
 }
 
-/*
-func sendBirthdaySMS(birthdays []string) {
-	accountSid := os.Getenv("accountSid")
-	authToken := os.Getenv("authToken")
-	client := twilio.NewRestClientWithParams(twilio.ClientParams{
-		Username: accountSid,
-		Password: authToken,
-	})
+func createMsg(todayBirthdays []User) string {
+	var msg string
 
-	birthdaysString := strings.Join(birthdays, ", ")
-
-	params := &openapi.CreateMessageParams{}
-	params.SetTo(os.Getenv("toPhoneNumber"))
-	params.SetBody("Todays birthdays: " + birthdaysString)
-	params.SetMessagingServiceSid(os.Getenv("messagingServiceSid"))
-
-	resp, err := client.Api.CreateMessage(params)
-	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		response, _ := json.Marshal(*resp)
-		fmt.Println("Response: " + string(response))
+	for _, birthday := range todayBirthdays {
+		msg += strings.Join([]string{birthday.fullName, birthday.birthday}, " - ")
+		msg += "\n"
 	}
+
+	return msg
 }
-*/
