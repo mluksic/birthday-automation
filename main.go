@@ -58,7 +58,7 @@ func main() {
 func birthdayAutomation() {
 	records, err := readFile("birthdays.csv")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("%v", err)
 	}
 
 	todayBirthdays := getTodayBirthdays(records)
@@ -78,23 +78,19 @@ func birthdayAutomation() {
 
 func readFile(filename string) ([][]string, error) {
 	file, err := os.Open(filename)
-
 	if err != nil {
 		log.Fatal(err)
 		return [][]string{}, err
 	}
-
 	defer file.Close()
 
 	reader := csv.NewReader(file)
-
 	// skip first line
 	if _, err := reader.Read(); err != nil {
 		return [][]string{}, err
 	}
 
 	records, err := reader.ReadAll()
-
 	if err != nil {
 		return [][]string{}, err
 	}
@@ -103,7 +99,7 @@ func readFile(filename string) ([][]string, error) {
 }
 
 func getTodayBirthdays(records [][]string) []User {
-	var birthdayPersons []User
+	birthdayPersons := make([]User, 10)
 	currentDate := time.Now().Local()
 
 	for _, record := range records {
@@ -113,9 +109,8 @@ func getTodayBirthdays(records [][]string) []User {
 		}
 
 		parsedUserBirthday, err := time.Parse("2006-01-02", user.birthday)
-
 		if err != nil {
-			fmt.Println("Could not parse time:", err)
+			fmt.Printf("Could not parse time: %v", err)
 		}
 
 		if currentDate.Day() == parsedUserBirthday.Day() && currentDate.Month() == parsedUserBirthday.Month() {
