@@ -1,20 +1,19 @@
 # Birthday notifier
 
-Send SMS birthday notification
+Send birthday alerts via email/SMS
 
 ## Dependencies
 
 -   [Go](https://go.dev/doc/install)
 -   [AWS Lambda](https://aws.amazon.com/lambda/)
--   [Twilio](https://www.twilio.com/sms)
 
-### Prerequisites
+## Prerequisites
 
 Download and install:
 
--   [Go](https://go.dev/doc/install)
+-   [Go v1.18+](https://go.dev/doc/install)
 
-### Running the app
+## Running the app
 
 1. Create `birthdays.csv` file with your birthdays
 ```
@@ -26,7 +25,7 @@ $ cp example_birthdays.csv birthdays.csv
 $ go run main.go
 ```
 
-### Build
+## Build
 
 1. Build binary:
 
@@ -40,7 +39,7 @@ $ GOOS=linux GOARCH=amd64 go build -o birthdays
 $ zip birthdays.zip birthdays birthdays.csv
 ```
 
-### Deploy
+## Deploy
 
 Project uses [Terraform](https://www.terraform.io/) to deploy and provising AWS Lambda function, triggers ect.
 
@@ -56,9 +55,9 @@ Basic TF commands:
 
 Lambda is currently being triggered every morning at 6AM UTC.
 
-### Test
+## Test
 
-When Lambda function has been successfuly deployed to AWS, run this command:
+When Lambda function has been successfully deployed to AWS, run this command:
 
 -   `aws lambda invoke --function-name birthdayAutomation response.json`
 
