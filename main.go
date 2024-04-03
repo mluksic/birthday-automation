@@ -99,7 +99,7 @@ func readFile(filename string) ([][]string, error) {
 }
 
 func getTodayBirthdays(records [][]string) []User {
-	birthdayPersons := make([]User, 10)
+	birthdayPersons := make([]User, 0, 10)
 	currentDate := time.Now().Local()
 
 	for _, record := range records {
