@@ -34,7 +34,7 @@ func NewEmailNotifier() *EmailNotifier {
 func (n *EmailNotifier) Notify(msg string) error {
 	message := []byte(fmt.Sprintf("Subject: današnji rojstni dnevi \n\n %s\n", msg))
 
-	receivers := strings.Split(os.Getenv("EMAIL_RECEIVERS"), ", ")
+	receivers := strings.Split(os.Getenv("EMAIL_RECEIVERS"), ",")
 	auth := smtp.PlainAuth("", n.fromEmail, n.password, n.smtpHost)
 	addr := fmt.Sprintf("%s:%s", n.smtpHost, n.smtpPort)
 
