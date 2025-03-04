@@ -55,10 +55,11 @@ func main() {
 	lambda.Start(birthdayAutomation)
 }
 
-func birthdayAutomation() {
+func birthdayAutomation() error {
 	records, err := readFile("birthdays.csv")
 	if err != nil {
-		fmt.Printf("%v", err)
+		log.Printf("%v", err)
+		return err
 	}
 
 	todayBirthdays := getTodayBirthdays(records)
@@ -69,17 +70,20 @@ func birthdayAutomation() {
 
 		err := notifier.Notify(msg)
 		if err != nil {
-			fmt.Printf("%v", err)
+			log.Printf("%v", err)
+			return err
 		}
 
-		fmt.Println("Notification sent successfully")
+		log.Println("Notification sent successfully")
 	}
+
+	return nil
 }
 
 func readFile(filename string) ([][]string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return [][]string{}, err
 	}
 	defer file.Close()
